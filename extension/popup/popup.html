@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI2MD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-ui">UI</span>
+        <span class="logo-arrow">→</span>
+        <span class="logo-md">MD</span>
+      </div>
+      <div class="header-right">
+        <div class="llm-badge" id="llmBadge" title="LLM status">
+          <!-- Populated by JS -->
+        </div>
+        <button class="settings-btn" id="settingsBtn" title="Settings">
+          ⚙
+        </button>
+      </div>
+    </header>
+
+    <!-- Site Info -->
+    <div class="site-info" id="siteInfo">
+      <span class="site-icon">◈</span>
+      <span class="site-url" id="siteUrl">Loading page info...</span>
+    </div>
+
+    <!-- Status / Progress Area -->
+    <div class="status-area" id="statusArea">
+
+      <!-- Idle State -->
+      <div class="state idle-state" id="idleState">
+        <div class="idle-graphic">
+          <div class="grip-line"></div>
+          <div class="grip-line"></div>
+          <div class="grip-line"></div>
+          <div class="grip-line"></div>
+          <div class="grip-line short"></div>
+        </div>
+        <p class="idle-hint">Analyze any page to extract its complete design system — colors, typography, spacing, hover states, and more.</p>
+
+        <!-- No-LLM warning -->
+        <div class="no-llm-warn hidden" id="noLlmWarn">
+          <span class="warn-icon">⚠</span>
+          <span class="warn-text">No AI key configured. Output will use built-in formatter.
+            <button class="warn-link" id="warnSettingsLink">Configure →</button>
+          </span>
+        </div>
+      </div>
+
+      <!-- Analyzing State -->
+      <div class="state analyzing-state hidden" id="analyzingState">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-meta">
+          <span class="progress-pct" id="progressPct">0%</span>
+          <span class="progress-msg" id="progressMsg">Starting...</span>
+        </div>
+        <div class="step-indicators" id="stepIndicators">
+          <div class="step" data-step="inject">DOM</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="debugger">CDP</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="pseudo">Hover</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="llm">AI</div>
+          <div class="step-line"></div>
+          <div class="step" data-step="format">Done</div>
+        </div>
+      </div>
+
+      <!-- Done State -->
+      <div class="state done-state hidden" id="doneState">
+        <div class="done-check">✓</div>
+        <div class="stats-grid" id="statsGrid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div class="state error-state hidden" id="errorState">
+        <div class="error-icon">!</div>
+        <p class="error-msg" id="errorMsg">Something went wrong.</p>
+        <button class="error-settings-link hidden" id="errorSettingsLink">
+          Open Settings →
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-primary" id="analyzeBtn">
+        <span class="btn-icon">◎</span>
+        Analyze Page
+      </button>
+      <button class="btn btn-secondary hidden" id="downloadBtn">
+        <span class="btn-icon">↓</span>
+        Download .md
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>UI2MD v1.0</span>
+      <span class="dot">·</span>
+      <span id="footerMode">Built-in formatter</span>
+    </footer>
+
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

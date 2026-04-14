@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "UI2MD — Design System Extractor",
+  "version": "1.0.0",
+  "description": "Analyzes any webpage's UI — colors, typography, layout, hover/focus states — and exports a rich AI-generated design system Markdown document.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "debugger",
+    "storage",
+    "downloads",
+    "tabs"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16":  "assets/icon16.png",
+      "48":  "assets/icon48.png",
+      "128": "assets/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background/service_worker.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["settings/settings.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16":  "assets/icon16.png",
+    "48":  "assets/icon48.png",
+    "128": "assets/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

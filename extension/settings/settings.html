@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI2MD — Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn" id="backBtn">← Back</button>
+      <div class="header-title">
+        <span class="title-text">Settings</span>
+        <span class="title-sub">UI → MD</span>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- Gemini API Key Section -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-icon">◈</span>
+          <span class="section-title">Gemini API Key</span>
+        </div>
+        <p class="section-desc">
+          Paste your Google Gemini API key to enable AI-powered design system generation.
+          Uses <span class="model-tag">gemini-3-flash-preview</span> by default.
+          <a class="docs-link" href="https://aistudio.google.com/apikey" target="_blank">Get a key ↗</a>
+        </p>
+
+        <!-- API Key Input -->
+        <div class="field">
+          <div class="key-input-wrap">
+            <input
+              class="field-input"
+              type="password"
+              id="apiKeyInput"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="AIza..."
+            />
+            <button class="key-toggle-btn" id="keyToggleBtn" title="Show/hide">👁</button>
+          </div>
+          <div class="key-status-row">
+            <span class="key-status" id="keyStatus"></span>
+            <button class="clear-btn" id="clearKeyBtn" title="Clear saved key">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Fallback option -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-icon">◉</span>
+          <span class="section-title">Behaviour</span>
+        </div>
+
+        <div class="field field-row">
+          <label class="toggle-label" for="fallbackToggle">
+            <div class="toggle-info">
+              <span class="toggle-title">Fallback to built-in formatter</span>
+              <span class="toggle-desc">If Gemini fails or no key is set, use the programmatic formatter</span>
+            </div>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="fallbackToggle" class="toggle-input" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Output options -->
+      <section class="section">
+        <div class="section-header">
+          <span class="section-icon">◫</span>
+          <span class="section-title">Output</span>
+        </div>
+
+        <div class="field field-row">
+          <label class="toggle-label" for="includeRoleToggle">
+            <div class="toggle-info">
+              <span class="toggle-title">Include &lt;role&gt; block</span>
+              <span class="toggle-desc">Adds AI persona context at the top of the document</span>
+            </div>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="includeRoleToggle" class="toggle-input" checked />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </div>
+          </label>
+        </div>
+
+        <div class="field field-row">
+          <label class="toggle-label" for="includeTokensToggle">
+            <div class="toggle-info">
+              <span class="toggle-title">Include raw tokens appendix</span>
+              <span class="toggle-desc">Appends raw extracted CSS variables at the end</span>
+            </div>
+            <div class="toggle-wrap">
+              <input type="checkbox" id="includeTokensToggle" class="toggle-input" />
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section class="section section-about">
+        <div class="about-row">
+          <span class="about-label">Version</span>
+          <span class="about-value mono">1.0.0</span>
+        </div>
+        <div class="about-row">
+          <span class="about-label">Default model</span>
+          <span class="about-value mono">gemini-3-flash-preview</span>
+        </div>
+        <div class="about-row">
+          <span class="about-label">Key storage</span>
+          <span class="about-value mono">chrome.storage.sync</span>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="footer">
+      <div class="save-status" id="saveStatus"></div>
+      <button class="btn btn-primary" id="saveBtn">Save</button>
+    </footer>
+
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
