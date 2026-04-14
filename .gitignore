@@ -4,5 +4,4 @@
 # Allow only these
 !/.gitignore
 !/README.md
-!/CLAUDE.md
 !/extension/
