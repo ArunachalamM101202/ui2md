@@ -1,0 +1,7 @@
+# Ignore everything at the repo root
+/*
+
+# Allow only these
+!/.gitignore
+!/CLAUDE.md
+!/extension/

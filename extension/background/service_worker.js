@@ -5,7 +5,7 @@
  */
 
 import { generateMarkdown } from '../formatter/markdown.js';
-import { callGemini, GEMINI_MODEL } from '../llm/gemini.js';
+import { getProvider } from '../llm/provider.js';
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let analysisInProgress = false;
@@ -71,19 +71,22 @@ async function runFullAnalysis(tabId) {
     const llmSettings = await loadLLMSettings();
     let markdown;
     let usedLLM = false;
+    let llmProviderLabel = null;
 
     if (llmSettings.apiKey) {
       try {
-        sendProgress(tabId, 80, `Generating markdown with Gemini...`);
-        markdown = await callGemini(llmSettings.apiKey, null, fullData);
+        const provider = getProvider(llmSettings.providerId);
+        sendProgress(tabId, 80, `Generating markdown with ${provider.name}...`);
+        markdown = await provider.call(llmSettings.apiKey, null, fullData);
         usedLLM = true;
+        llmProviderLabel = `${provider.name} (${provider.defaultModel})`;
         sendProgress(tabId, 95, 'Finalizing...');
       } catch (llmErr) {
         if (llmSettings.fallback) {
-          sendProgress(tabId, 80, `Gemini failed — using built-in formatter`);
+          sendProgress(tabId, 80, 'AI failed — using built-in formatter');
           markdown = generateMarkdown(fullData);
         } else {
-          throw new Error(`Gemini error: ${llmErr.message}`);
+          throw new Error(`LLM error: ${llmErr.message}`);
         }
       }
     } else {
@@ -96,7 +99,7 @@ async function runFullAnalysis(tabId) {
       markdown,
       summary: buildSummary(domData),
       usedLLM,
-      llmProvider: usedLLM ? `Gemini (${GEMINI_MODEL})` : null
+      llmProvider: llmProviderLabel
     };
 
   } catch (err) {
@@ -111,13 +114,21 @@ async function runFullAnalysis(tabId) {
 
 // ─── LLM Settings Loader ──────────────────────────────────────────────────────
 async function loadLLMSettings() {
-  const { gemini_api_key, llm_fallback } = await chrome.storage.sync.get([
-    'gemini_api_key', 'llm_fallback'
+  const stored = await chrome.storage.sync.get([
+    'active_provider', 'gemini_api_key', 'claude_api_key', 'llm_fallback'
   ]);
 
+  const providerId = stored.active_provider || 'gemini';
+  const keyMap = {
+    gemini: stored.gemini_api_key,
+    claude: stored.claude_api_key
+  };
+  const apiKey = keyMap[providerId]?.trim() || null;
+
   return {
-    apiKey:  gemini_api_key?.trim() || null,
-    fallback: llm_fallback !== false
+    providerId,
+    apiKey,
+    fallback: stored.llm_fallback !== false
   };
 }
 

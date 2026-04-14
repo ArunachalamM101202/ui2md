@@ -66,17 +66,26 @@ async function init() {
 
 // ─── LLM Status ───────────────────────────────────────────────────────────────
 async function refreshLLMStatus() {
-  const { gemini_api_key } = await chrome.storage.sync.get(['gemini_api_key']);
-  const hasKey = gemini_api_key && gemini_api_key.trim().length > 10;
+  const stored = await chrome.storage.sync.get([
+    'active_provider', 'gemini_api_key', 'claude_api_key'
+  ]);
+
+  const providerId = stored.active_provider || 'gemini';
+  const keyMap = { gemini: stored.gemini_api_key, claude: stored.claude_api_key };
+  const key = keyMap[providerId];
+  const hasKey = key && key.trim().length > 10;
+
+  const providerLabels = { gemini: 'Gemini', claude: 'Claude' };
+  const providerName = providerLabels[providerId] || providerId;
 
   if (hasKey) {
     llmConfigured = true;
-    llmProviderName = 'Gemini';
-    llmBadge.textContent = 'Gemini';
+    llmProviderName = providerName;
+    llmBadge.textContent = providerName;
     llmBadge.className = 'llm-badge active';
-    llmBadge.title = 'AI: Gemini (gemini-3-flash-preview)';
+    llmBadge.title = `AI: ${providerName}`;
     noLlmWarn.classList.add('hidden');
-    footerMode.textContent = 'Gemini AI';
+    footerMode.textContent = `${providerName} AI`;
   } else {
     llmConfigured = false;
     llmBadge.textContent = 'No AI';

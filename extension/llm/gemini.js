@@ -75,3 +75,29 @@ export async function callGemini(apiKey, model, analysisData) {
 
   return text;
 }
+
+// ─── Provider Class ───────────────────────────────────────────────────────────
+
+export class GeminiProvider {
+  get name()         { return 'Gemini'; }
+  get id()           { return 'gemini'; }
+  get defaultModel() { return GEMINI_MODEL; }
+
+  get models() {
+    return [
+      { id: 'gemini-3-flash-preview', label: 'Gemini 3 Flash (Default)' },
+      { id: 'gemini-2.5-pro-preview-05-06', label: 'Gemini 2.5 Pro (Best quality)' }
+    ];
+  }
+
+  get keyPlaceholder() { return 'AIza...'; }
+  get keyDocsUrl()     { return 'https://aistudio.google.com/apikey'; }
+
+  async call(apiKey, model, analysisData) {
+    return callGemini(apiKey, model, analysisData);
+  }
+
+  validateKey(apiKey) {
+    return typeof apiKey === 'string' && apiKey.trim().length > 10;
+  }
+}

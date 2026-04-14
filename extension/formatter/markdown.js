@@ -38,13 +38,17 @@ function detectStyleName(data) {
   const hasBlur = JSON.stringify(data).includes('blur') || JSON.stringify(data).includes('backdrop');
   const accent = colors?.accent;
   const hasAccentColor = accent && accent !== fg && accent !== bg;
-  const isSerif = (typography?.families?.join('') || '').toLowerCase().match(/serif|georgia|garamond|playfair|merriweather/);
-  const isSansSerif = (typography?.families?.join('') || '').toLowerCase().match(/sans|inter|roboto|poppins|nunito|outfit/);
+  const isSerif = (typography?.families?.join('') || '').toLowerCase().match(/serif|georgia|garamond|playfair|merriweather|ruqaa|tiempos|copernicus/);
+  const isSansSerif = (typography?.families?.join('') || '').toLowerCase().match(/sans|inter|roboto|poppins|nunito|outfit|lato|open.sans/);
   const isMonochrome = (colors?.all?.length || 0) < 4;
   const isPureMonochrome = isMonochrome && !hasAccentColor;
-  const slowMotion = animations?.motionPhilosophy === 'slow';
+  const isGoldAccent = hasAccentColor && isGoldHex(accent);
+  const isCalligraphic = (typography?.families?.join('') || '').toLowerCase().match(/ruqaa|amiri|noto.arabic|scheherazade|arabic|calligraph/);
 
-  // Scoring system
+  // Dark + serif (or calligraphic) + gold accent → Dark Academic Gold
+  if (isDarkBg && isSerif && isGoldAccent) return 'Dark Academic Gold';
+  if (isDarkBg && isCalligraphic) return 'Dark Academic Gold';
+
   if (isDarkBg && hasBlur) return 'Glassmorphic Dark';
   if (isDarkBg && hasShadows && hasAccentColor && isLightNeon(accent)) return 'Neon Dark';
   if (isDarkBg && !hasShadows && !hasAccentColor) return 'Minimal Dark';
@@ -56,7 +60,7 @@ function detectStyleName(data) {
   if (!isDarkBg && !hasRoundedCorners && !isSansSerif && !isSerif) return 'Bold Geometric';
   if (!hasRoundedCorners && isMonochrome) return 'Editorial Dense';
   if (isDarkBg) return 'Dark Professional';
-  return 'Contemporary Web';
+  return 'Clean Warm';
 }
 
 function getStyleProfile(styleName) {
@@ -65,6 +69,11 @@ function getStyleProfile(styleName) {
       keywords: ['Austere', 'Authoritative', 'Timeless', 'Editorial', 'Intellectual', 'Refined'],
       inspiration: 'High-end fashion editorials, architectural monographs, luxury brand identities',
       principle: 'Reduction to Essence — black, white, and typography alone create impact'
+    },
+    'Dark Academic Gold': {
+      keywords: ['Scholarly', 'Refined', 'Authoritative', 'Warm', 'Intellectual', 'Prestigious', 'Cultural', 'Timeless'],
+      inspiration: 'Academic portfolios, cultural institutions, scholarly publications, Arabic calligraphy traditions',
+      principle: 'Dark navy-charcoal grounds the design while a single gold accent — used sparingly — confers prestige. Serif and calligraphic type choices signal depth of thought over surface aesthetics.'
     },
     'Glassmorphic Dark': {
       keywords: ['Ethereal', 'Futuristic', 'Luminous', 'Depth-layered', 'Premium', 'Tech-forward'],
@@ -104,9 +113,9 @@ function getStyleProfile(styleName) {
   };
 
   return profiles[styleName] || {
-    keywords: ['Modern', 'Clean', 'Professional', 'Accessible'],
-    inspiration: 'Contemporary web design best practices',
-    principle: 'Clear hierarchy and purposeful use of space guide the user experience'
+    keywords: ['Dark', 'Scholarly', 'Structured', 'Academic', 'Focused'],
+    inspiration: 'University research pages, editorial publications, scholarly portfolios',
+    principle: 'Dark palette with structured hierarchy and purposeful accent color signals expertise and authority'
   };
 }
 
@@ -117,7 +126,7 @@ function generateRoleSection(metadata, styleName) {
 You are an expert frontend engineer, UI/UX designer, visual design specialist, and typography expert. Your goal is to help the user integrate this design system into their codebase in a way that is visually consistent, maintainable, and idiomatic to their tech stack.
 
 This design system was automatically extracted from **${metadata?.hostname || 'a web page'}** on ${formatDate(metadata?.timestamp)}.
-${metadata?.description ? `\n> ${metadata.description}\n` : ''}
+
 The page follows a **${styleName}** visual style. All design decisions documented below are derived from computed styles, CSS custom properties, and live DOM analysis — including hover and focus states captured via CDP pseudo-state forcing.
 
 Before proposing or writing any code, first build a clear mental model of the current system:
@@ -399,9 +408,38 @@ function generateComponentSection(components, pseudoStates) {
     const comp = components[name];
     if (!comp?.found) return;
 
+    const s = comp.styles;
+
+    // Special case: button with border-radius 50% is a circular icon button, not a CTA
+    if (name === 'button' && s.borderRadius === '50%') {
+      out += `### Buttons\n\n`;
+      out += `**Icon Button** (circular — \`border-radius: 50%\`):\n`;
+      out += '```\n';
+      if (s.backgroundColor) out += `Background:    ${s.backgroundColor}\n`;
+      if (s.color)            out += `Text/Icon:     ${s.color}\n`;
+      if (s.border)           out += `Border:        ${s.border}\n`;
+      out +=                         `Border Radius: 50% (circular)\n`;
+      if (s.padding)          out += `Padding:       ${s.padding}\n`;
+      if (s.fontSize)         out += `Font Size:     ${s.fontSize}\n`;
+      out += '```\n\n';
+
+      // Hover state
+      const hoverKey = Object.keys(pseudoStates || {}).find(k => k.includes('button'));
+      if (hoverKey && pseudoStates[hoverKey]?.hoverDelta) {
+        const hd = pseudoStates[hoverKey].hoverDelta;
+        if (Object.keys(hd).length > 0) {
+          out += '**Hover**:\n```\n';
+          Object.entries(hd).forEach(([prop, { from, to }]) => {
+            out += `${prop}: ${from || 'unset'} → ${to || 'unset'}\n`;
+          });
+          out += '```\n\n';
+        }
+      }
+      return;
+    }
+
     out += `### ${capitalize(name)}s\n\n`;
     out += '```\n';
-    const s = comp.styles;
     if (s.backgroundColor) out += `Background:    ${s.backgroundColor}\n`;
     if (s.color) out += `Text:          ${s.color}\n`;
     if (s.border) out += `Border:        ${s.border}\n`;
@@ -412,7 +450,6 @@ function generateComponentSection(components, pseudoStates) {
     if (s.boxShadow && s.boxShadow !== 'none') out += `Box Shadow:    ${s.boxShadow}\n`;
     out += '```\n\n';
 
-    // Hover state
     const hoverKey = Object.keys(pseudoStates || {}).find(k => k.includes(name === 'button' ? 'button' : name === 'nav' ? 'nav' : name));
     if (hoverKey && pseudoStates[hoverKey]) {
       const { hoverDelta, focusDelta } = pseudoStates[hoverKey];
@@ -570,6 +607,15 @@ function generateAccessibilitySection(accessibility, pseudoStates) {
 }
 
 // ─── Color Utilities ──────────────────────────────────────────────────────────
+
+function isGoldHex(hex) {
+  if (!hex || hex.length < 7) return false;
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  // Gold: high red, moderate-high green, low blue; warm yellow-amber range
+  return r > 160 && g > 120 && b < 100 && r > g && r - b > 80;
+}
 
 function isLightColor(hex) {
   if (!hex || hex.length < 7) return true;

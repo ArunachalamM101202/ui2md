@@ -17,13 +17,12 @@
  */
 
 import { GeminiProvider } from './gemini.js';
+import { ClaudeProvider } from './claude.js';
 
 // ─── Provider Registry ────────────────────────────────────────────────────────
-// Add new providers here as they are implemented.
 export const PROVIDERS = {
   gemini: new GeminiProvider(),
-  // openai: new OpenAIProvider(),   ← future
-  // claude: new ClaudeProvider(),   ← future
+  claude: new ClaudeProvider(),
 };
 
 // ─── Factory ──────────────────────────────────────────────────────────────────

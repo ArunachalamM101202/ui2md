@@ -21,17 +21,18 @@ Your audience: AI coding assistants and senior frontend engineers who will use t
 CRITICAL RULES — READ BEFORE WRITING ANYTHING
 ═══════════════════════════════════════════════════════
 
-1. DO NOT dump or reproduce token lists verbatim. The data sent to you is raw extraction — YOU must curate it.
-2. For Colors: write ONLY 8-12 core semantic tokens. Give each a name, exact hex, and one-sentence purpose.
-3. For Typography: write a proper TABLE — Role | Family | Size(px) | Size(rem) | Weight | Line-Height | Use
-4. REMOVE all CSS module class patterns from your output. These look like: "__abc123__", "ModuleName-module-scss-module__HASH__class". Never reproduce them. Clean element names only (e.g. "a", "button", "nav").
-5. Bold Choices section MUST appear — it is required output. Do not skip it.
-6. "What Success Looks Like" section MUST appear — required output. Do not skip.
-7. "What This Design Is NOT" section MUST appear — required output.
-8. The DNA section must have at least 4 numbered characteristics with prose paragraphs, not bullets.
-9. Component sections: write prose behavioral description + a minimal style block. Not just raw CSS.
-10. Breakpoints: group into tiers (mobile/tablet/desktop/wide). Never list 20+ raw pixel values.
-11. Total target length: 400-700 lines. Dense and specific, not padded.
+1. NEVER reproduce page text content in any form. The Title and Description fields in the metadata are context — describe the site's purpose IN YOUR OWN WORDS. Do NOT quote them, blockquote them, or paste them verbatim anywhere in the output.
+2. DO NOT dump or reproduce token lists verbatim. The data sent to you is raw extraction — YOU must curate it.
+3. For Colors: write ONLY 8-12 core semantic tokens. Give each a name, exact hex, and one-sentence purpose.
+4. For Typography: write a proper TABLE — Role | Family | Size(px) | Size(rem) | Weight | Line-Height | Use
+5. REMOVE all CSS module class patterns from your output. These look like: "__abc123__", "ModuleName-module-scss-module__HASH__class". Never reproduce them. Clean element names only (e.g. "a", "button", "nav").
+6. Bold Choices section MUST appear — it is required output. Do not skip it.
+7. "What Success Looks Like" section MUST appear — required output. Do not skip.
+8. "What This Design Is NOT" section MUST appear — required output.
+9. The DNA section must have at least 4 numbered characteristics with prose paragraphs, not bullets.
+10. Component sections: write prose behavioral description + a minimal style block. Not just raw CSS.
+11. Breakpoints: group into tiers (mobile/tablet/desktop/wide). Never list 20+ raw pixel values.
+12. Total target length: 400-700 lines. Dense and specific, not padded.
 
 ═══════════════════════════════════════════════════════
 EXACT OUTPUT STRUCTURE
@@ -261,12 +262,18 @@ export function buildUserPrompt(analysisData) {
   const sections = [];
 
   // ── 1. Page Metadata ──────────────────────────────────────────────────────
+  // Description is truncated and labeled context-only to prevent Gemini quoting it
+  const rawDesc = metadata?.description || '';
+  const safeDesc = rawDesc.length > 120
+    ? rawDesc.slice(0, 120).trimEnd() + '…'
+    : rawDesc || 'None';
+
   sections.push(`## PAGE METADATA
 URL:         ${metadata?.url || 'Unknown'}
 Hostname:    ${metadata?.hostname || 'Unknown'}
 Path:        ${metadata?.path || '/'}
 Title:       ${metadata?.title || 'Unknown'}
-Description: ${metadata?.description || 'None'}
+Site purpose (context only — DO NOT quote this in output): ${safeDesc}
 Theme Color: ${metadata?.themeColor || 'None'}
 Analyzed:    ${formatDate(metadata?.timestamp)}`);
 

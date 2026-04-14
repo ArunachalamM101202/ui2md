@@ -8,6 +8,38 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="settings.css" />
+  <style>
+    /* Provider tabs */
+    .provider-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+    .provider-tab {
+      flex: 1;
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      color: var(--text-dimmer);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 6px 10px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+    .provider-tab:hover {
+      color: var(--text-dim);
+      border-color: var(--text-dimmer);
+    }
+    .provider-tab.active {
+      background: rgba(74, 222, 128, 0.08);
+      border-color: rgba(74, 222, 128, 0.4);
+      color: var(--accent-green);
+    }
+  </style>
 </head>
 <body>
   <div class="app">
@@ -23,16 +55,22 @@
 
     <main class="content">
 
-      <!-- Gemini API Key Section -->
+      <!-- AI Provider + API Key -->
       <section class="section">
         <div class="section-header">
           <span class="section-icon">◈</span>
-          <span class="section-title">Gemini API Key</span>
+          <span class="section-title">AI Provider</span>
         </div>
-        <p class="section-desc">
-          Paste your Google Gemini API key to enable AI-powered design system generation.
-          Uses <span class="model-tag">gemini-3-flash-preview</span> by default.
-          <a class="docs-link" href="https://aistudio.google.com/apikey" target="_blank">Get a key ↗</a>
+
+        <!-- Provider selector tabs -->
+        <div class="provider-tabs">
+          <button class="provider-tab" id="tabGemini" data-provider="gemini">Gemini</button>
+          <button class="provider-tab" id="tabClaude" data-provider="claude">Claude</button>
+        </div>
+
+        <!-- Dynamic description -->
+        <p class="section-desc" id="providerDesc">
+          <!-- populated by JS -->
         </p>
 
         <!-- API Key Input -->
@@ -44,7 +82,7 @@
               id="apiKeyInput"
               autocomplete="off"
               spellcheck="false"
-              placeholder="AIza..."
+              placeholder=""
             />
             <button class="key-toggle-btn" id="keyToggleBtn" title="Show/hide">👁</button>
           </div>
@@ -66,7 +104,7 @@
           <label class="toggle-label" for="fallbackToggle">
             <div class="toggle-info">
               <span class="toggle-title">Fallback to built-in formatter</span>
-              <span class="toggle-desc">If Gemini fails or no key is set, use the programmatic formatter</span>
+              <span class="toggle-desc">If AI fails or no key is set, use the programmatic formatter</span>
             </div>
             <div class="toggle-wrap">
               <input type="checkbox" id="fallbackToggle" class="toggle-input" checked />
@@ -117,8 +155,8 @@
           <span class="about-value mono">1.0.0</span>
         </div>
         <div class="about-row">
-          <span class="about-label">Default model</span>
-          <span class="about-value mono">gemini-3-flash-preview</span>
+          <span class="about-label">Active provider</span>
+          <span class="about-value mono" id="aboutProvider">—</span>
         </div>
         <div class="about-row">
           <span class="about-label">Key storage</span>
